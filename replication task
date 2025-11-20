@@ -1,0 +1,47 @@
+ {
+   
+    "ReplicationTasks": [
+	    {
+		    
+			"replicationTaskIdentifier": "UAT_DMS_MIGRATION"
+			"SourceEndpointArn": "arn:aws:dms:endpoint.source.endpoint_arn"
+			"TargetEndpointArn": "arn:aws:dms:endpoint.target.endpoint_arn"
+			"ReplicationInstanceArn": "arn:aws:dms:replication_instance.this.replication_instance_arn
+			"migration_type": "full-load",
+			TableMappings": {
+               "rules": [
+                  {
+				   
+                       "rule-type": "selection",
+                       "rule-id": "1",
+                       "rule-name": "include-all",
+                       "object-locator": {
+                           "schema-name": "%",
+                           "table-name": "%"
+                      },
+      "rule-action": "include"
+    }
+  ]
+}
+EOT
+
+  # Optional: fine-tune task settings
+  replication_task_settings = <<EOT
+{
+  "TargetMetadata": {
+    "ParallelApplyThreads": 8,
+    "ParallelApplyBufferSize": 1000
+  },
+  "FullLoadSettings": {
+    "TargetTablePrepMode": "DO_NOTHING",
+    "StopTaskCachedChangesApplied": false,
+    "StopTaskCachedChangesNotApplied": false
+  }
+}
+EOT
+
+  tags = {
+    Project = "dms"
+    Env     = "dev"
+  }
+}
