@@ -1,31 +1,29 @@
- {
-   
-    "ReplicationTasks": [
-	    {
-		    
-			"replicationTaskIdentifier": "UAT_DMS_MIGRATION"
-			"SourceEndpointArn": "arn:aws:dms:endpoint.source.endpoint_arn"
-			"TargetEndpointArn": "arn:aws:dms:endpoint.target.endpoint_arn"
-			"ReplicationInstanceArn": "arn:aws:dms:replication_instance.this.replication_instance_arn
-			"migration_type": "full-load",
-			TableMappings": {
-               "rules": [
-                  {
-				   
-                       "rule-type": "selection",
-                       "rule-id": "1",
-                       "rule-name": "include-all",
-                       "object-locator": {
-                           "schema-name": "%",
-                           "table-name": "%"
-                      },
+resource "aws_dms_replication_task" "uat_migration" {
+  replication_task_id       = "UAT_DMS_MIGRATION"
+  migration_type            = "full-load"
+  replication_instance_arn  = aws_dms_replication_instance.this.replication_instance_arn
+  source_endpoint_arn       = aws_dms_endpoint.source.endpoint_arn
+  target_endpoint_arn       = aws_dms_endpoint.target.endpoint_arn
+
+  # Table mappings JSON
+  table_mappings = <<EOT
+{
+  "rules": [
+    {
+      "rule-type": "selection",
+      "rule-id": "1",
+      "rule-name": "include-all",
+      "object-locator": {
+        "schema-name": "%",
+        "table-name": "%"
+      },
       "rule-action": "include"
     }
   ]
 }
 EOT
 
-  # Optional: fine-tune task settings
+  # Optional: fine-tune task settings JSON
   replication_task_settings = <<EOT
 {
   "TargetMetadata": {
@@ -39,9 +37,4 @@ EOT
   }
 }
 EOT
-
-  tags = {
-    Project = "dms"
-    Env     = "dev"
-  }
 }
